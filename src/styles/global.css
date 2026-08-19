@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+/* Fuentes self-hosted — sin CDN externo. */
+@import "@fontsource-variable/archivo";
+@import "@fontsource-variable/inter";
+
+/*
+  Tokens de marca. Fuente de verdad: DESIGN.md (derivado del logo real).
+  NO tomar valores de branding.json — es un scrape del sitio Elementor viejo
+  y su tipografía/escala está rota (h1: 14px con h2: 54px).
+*/
+@theme {
+  /* Base grafito — coincide con el disco del logo */
+  --color-ink-900: #1E2530;
+  --color-ink-800: #2D3542;
+  --color-ink-600: #4A5566;
+  --color-ink-300: #C7CDD6;
+
+  /*
+    Magenta de marca. Sale del moño del logo y del tagline "Pack anything beautifully".
+    ⚠️ CONTRASTE — no es intercambiable:
+      accent sobre surface (blanco) ....... 5.94:1  → AA, texto chico OK
+      accent sobre ink-900 ................ 2.59:1  → FALLA. Solo relleno gráfico
+                                                      o display grande, nunca texto chico.
+      accent-on-dark sobre ink-900 ........ 5.25:1  → AA. Este es el token para fondo oscuro.
+    El hero es oscuro, así que la distinción aplica desde la primera sección.
+  */
+  --color-accent: #BC2559;
+  --color-accent-hi: #CC3366;
+  --color-accent-on-dark: #F2669A;
+
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F8F8F8;
+
+  /* Archivo para headings (sans técnico/industrial), Inter para body. */
+  --font-heading: "Archivo Variable", "Archivo", system-ui, sans-serif;
+  --font-body: "Inter Variable", "Inter", system-ui, sans-serif;
+
+  /* Esquinas casi rectas — coherente con lo industrial. */
+  --radius-DEFAULT: 3px;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+
+  --spacing: 4px;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-body);
+    color: var(--color-ink-900);
+    background-color: var(--color-surface);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Etiqueta de sección: la curva del moño del logo reinterpretada como regla fina. */
+  .eyebrow {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  /*
+    Hamburguesa → X, manejada por CSS desde aria-expanded.
+
+    Ojo: NO usar clases de Tailwind aplicadas por JS para esto. Tailwind v4 escanea
+    el markup en busca de nombres de clase, y las que aparecen únicamente dentro de
+    un <script> no se generan — la clase queda en el classList pero la regla CSS no
+    existe. aria-expanded ya es la fuente de verdad accesible, así que colgamos el
+    estilo de ahí y el script solo cambia el atributo.
+  */
+  .nav-bar {
+    transition: rotate 200ms ease, translate 200ms ease, opacity 150ms ease;
+  }
+
+  #nav-toggle[aria-expanded="true"] .nav-bar:nth-child(1) {
+    translate: 0 7px;
+    rotate: 45deg;
+  }
+
+  #nav-toggle[aria-expanded="true"] .nav-bar:nth-child(2) {
+    opacity: 0;
+  }
+
+  #nav-toggle[aria-expanded="true"] .nav-bar:nth-child(3) {
+    translate: 0 -7px;
+    rotate: -45deg;
+  }
+}

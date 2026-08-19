@@ -1,0 +1,108 @@
+---
+import { company } from '../data/company';
+import { getLangFromUrl, useTranslations, localeUrl } from '../i18n/ui';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const year = new Date().getFullYear();
+
+const labels: Record<string, string> = {
+  hq: t('footer.hq'),
+  qc: t('footer.qc'),
+  usa: t('footer.usa'),
+};
+
+const nav = [
+  { href: localeUrl(lang, 'products'), label: t('nav.products') },
+  { href: localeUrl(lang, 'services'), label: t('nav.services') },
+  { href: localeUrl(lang, 'testimonials'), label: t('nav.testimonials') },
+  { href: localeUrl(lang, 'videos'), label: t('nav.videos') },
+  { href: localeUrl(lang, 'quote'), label: t('nav.quote') },
+];
+---
+
+<footer class="bg-ink-900 text-ink-300">
+  <div class="mx-auto max-w-[1280px] px-6 lg:px-10 py-16 lg:py-20">
+    <!--
+      Layout asimétrico a propósito: las 3 ubicaciones ocupan el peso visual
+      (la presencia Ontario+Québec es argumento de venta), el nav queda angosto.
+      Nada de cuatro columnas iguales tipo template.
+    -->
+    <div class="grid gap-12 lg:grid-cols-[1.6fr_1fr]">
+      <div>
+        <h2 class="eyebrow text-accent-on-dark mb-6">{t('footer.locations')}</h2>
+        <ul class="grid gap-8 sm:grid-cols-3">
+          {company.locations.map((loc) => (
+            <li>
+              <p class="font-heading text-sm font-semibold text-white mb-2">
+                {labels[loc.key] ?? loc.region}
+              </p>
+              <address class="not-italic text-sm leading-relaxed text-ink-300/80">
+                {loc.address}<br />{loc.city}
+              </address>
+              {loc.phone && (
+                <a
+                  href={`tel:${loc.phoneHref}`}
+                  class="mt-2 inline-block text-sm font-medium text-white hover:text-accent-on-dark transition-colors"
+                >
+                  {loc.phone}
+                </a>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="grid gap-10 sm:grid-cols-2 lg:border-l lg:border-white/10 lg:pl-12">
+        <nav aria-label="Footer">
+          <h2 class="eyebrow text-accent-on-dark mb-6">{t('nav.menu')}</h2>
+          <ul class="space-y-3">
+            {nav.map((item) => (
+              <li>
+                <a href={item.href} class="text-sm hover:text-white transition-colors">{item.label}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div>
+          <h2 class="eyebrow text-accent-on-dark mb-6">{t('footer.contact')}</h2>
+          <a
+            href={`mailto:${company.email}`}
+            class="text-sm text-white hover:text-accent-on-dark transition-colors break-all"
+          >
+            {company.email}
+          </a>
+
+          <h2 class="eyebrow text-accent-on-dark mt-8 mb-4">{t('footer.follow')}</h2>
+          <ul class="space-y-3">
+            {company.socials.map((s) => (
+              <li>
+                <a
+                  href={s.href}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  class="text-sm hover:text-white transition-colors"
+                >
+                  {s.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-16 pt-8 border-t border-white/10 flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between">
+      <p class="font-heading text-sm text-white">
+        {company.name} <span class="text-accent-on-dark">— {t('footer.tagline')}</span>
+      </p>
+      <p class="text-xs text-ink-300/60">
+        © {company.founded}–{year} {company.name}. {t('footer.rights')}
+      </p>
+    </div>
+
+    <!-- Nota de demo: esto no va en el sitio productivo del cliente. -->
+    <p class="mt-6 text-xs text-ink-300/40">{t('footer.demo')}</p>
+  </div>
+</footer>

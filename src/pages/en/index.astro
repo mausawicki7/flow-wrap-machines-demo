@@ -1,0 +1,298 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { company } from '../../data/company';
+import { byLocale, localeUrl, withBase } from '../../i18n/ui';
+
+const lang = 'en';
+
+const products = byLocale(await getCollection('products'), lang).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+const testimonials = byLocale(await getCollection('testimonials'), lang)
+  .filter((t) => t.data.featured)
+  .sort((a, b) => a.data.order - b.data.order);
+const videos = byLocale(await getCollection('videos'), lang).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+const slug = (id: string) => id.split('/')[1]!.replace(/^\d+-/, '');
+---
+
+<BaseLayout
+  title="Packaging machines built to a higher standard | D.T. Flow Wrap Machines"
+  description="D.T. Flow Wrap Machines supplies horizontal flow-wrap and vertical VFFS packaging machinery across Ontario, Québec and the United States. 50+ models, CE certified."
+>
+  {/*
+    HERO — video real del cliente de fondo. Alineado a la izquierda a propósito:
+    el centrado simétrico es la firma del template de Elementor que estamos dejando atrás.
+  */}
+  <section class="relative bg-ink-900 overflow-hidden">
+    <video
+      class="absolute inset-0 w-full h-full object-cover opacity-60"
+      src={withBase(company.heroVideo)}
+      autoplay
+      muted
+      loop
+      playsinline
+      aria-hidden="true"
+      tabindex="-1"
+    ></video>
+    {/*
+      Degradé para garantizar contraste del texto sobre cualquier frame del video.
+      Calibrado para el peor caso (frame casi blanco): con el video al 60% y el velo
+      al 95%/70% sobre la mitad izquierda, el fondo efectivo bajo el texto se mantiene
+      oscuro y el blanco conserva ~9:1. Hacia la derecha el velo baja a 25% y el video
+      se ve casi limpio, que es donde no hay texto encima.
+    */}
+    <div
+      class="absolute inset-0 bg-gradient-to-r from-ink-900/95 via-ink-900/70 to-ink-900/25"
+      aria-hidden="true"
+    >
+    </div>
+
+    <div class="relative mx-auto max-w-[1280px] px-6 lg:px-10 py-24 lg:py-36">
+      <div class="max-w-3xl">
+        <p class="eyebrow text-accent-on-dark mb-6">
+          Horizontal flow-wrap &amp; vertical VFFS
+        </p>
+        <h1 class="text-white text-4xl sm:text-5xl lg:text-6xl leading-[1.05]">
+          Packaging machines built to a higher standard
+        </h1>
+        <p class="mt-8 text-lg lg:text-xl text-ink-300 max-w-2xl leading-relaxed">
+          We import from selected suppliers and rebuild every machine in our own plant
+          with North American and German technology. Over 50 models, CE certified,
+          supported from Ontario and Québec.
+        </p>
+        <div class="mt-10 flex flex-wrap items-center gap-4">
+          <a
+            href={localeUrl(lang, 'quote')}
+            class="inline-flex items-center rounded-sm bg-accent px-7 py-4 font-semibold text-white hover:bg-accent-hi transition-colors"
+          >
+            Get a Quote
+          </a>
+          <a
+            href={localeUrl(lang, 'products')}
+            class="inline-flex items-center rounded-sm border border-white/30 px-7 py-4 font-semibold text-white hover:border-white hover:bg-white/5 transition-colors"
+          >
+            See the range
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* STAT BAR — proof points concretos, todos verificables en el sitio actual. */}
+  <section class="bg-ink-800 border-t border-white/10" aria-label="Company facts">
+    <div class="mx-auto max-w-[1280px] px-6 lg:px-10">
+      <dl class="grid grid-cols-2 lg:grid-cols-4">
+        {
+          company.stats.map((stat, i) => (
+            <div
+              class:list={[
+                'py-8 lg:py-10 lg:px-8',
+                i > 0 && 'sm:border-l border-white/10 sm:pl-6 lg:pl-8',
+                i > 1 && 'border-t sm:border-t-0',
+              ]}
+            >
+              <dt class="sr-only">{stat.label}</dt>
+              <dd>
+                <span class="block font-heading text-3xl lg:text-4xl font-bold text-white">
+                  {stat.value}
+                </span>
+                <span class="mt-2 block text-sm text-ink-300/80">{stat.label}</span>
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  {/*
+    LÍNEAS DE PRODUCTO — grid asimétrico: la primera tarjeta ocupa el doble porque
+    el flow-wrap horizontal es el producto insignia y el único con contenido real fuerte.
+    Sin imágenes falsas: tratamiento tipográfico con índice numerado.
+  */}
+  <section class="py-20 lg:py-28">
+    <div class="mx-auto max-w-[1280px] px-6 lg:px-10">
+      <div class="flex flex-wrap items-end justify-between gap-6 mb-14">
+        <div class="max-w-2xl">
+          <p class="eyebrow text-accent mb-4">Product lines</p>
+          <h2 class="text-3xl lg:text-4xl">Six ranges, one plant behind them</h2>
+        </div>
+        <a
+          href={localeUrl(lang, 'products')}
+          class="group inline-flex items-center gap-2 font-semibold text-accent hover:text-accent-hi transition-colors"
+        >
+          All products
+          <span aria-hidden="true" class="transition-transform group-hover:translate-x-1">→</span>
+        </a>
+      </div>
+
+      <ul
+        class="grid gap-px bg-ink-300/60 sm:grid-cols-2 lg:grid-cols-3 border border-ink-300/60"
+      >
+        {
+          products.map((p, i) => (
+            <li class:list={['bg-surface', i === 0 && 'sm:col-span-2']}>
+              <a
+                href={`${localeUrl(lang, 'products')}#${slug(p.id)}`}
+                class="group flex h-full flex-col p-8 lg:p-10 hover:bg-surface-2 transition-colors"
+              >
+                <span class="font-heading text-sm font-bold text-accent">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <h3
+                  class:list={[
+                    'mt-6 font-bold group-hover:text-accent transition-colors',
+                    i === 0 ? 'text-2xl lg:text-3xl' : 'text-xl',
+                  ]}
+                >
+                  {p.data.title}
+                </h3>
+                <p class="mt-3 text-ink-600 leading-relaxed">{p.data.summary}</p>
+                {/* PLACEHOLDER: content needed from client */}
+                {p.data.contentNeeded && (
+                  <span class="mt-4 inline-flex w-fit items-center rounded-sm bg-surface-2 px-2 py-1 text-xs font-medium text-ink-600 border border-ink-300">
+                    Expanded range
+                  </span>
+                )}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  {/* TESTIMONIOS — ciudad destacada: refuerza la presencia Ontario + Québec. */}
+  <section class="bg-surface-2 border-y border-ink-300/60 py-20 lg:py-28">
+    <div class="mx-auto max-w-[1280px] px-6 lg:px-10">
+      <div class="flex flex-wrap items-end justify-between gap-6 mb-14">
+        <div class="max-w-2xl">
+          <p class="eyebrow text-accent mb-4">From the floor</p>
+          <h2 class="text-3xl lg:text-4xl">What operators say after the install</h2>
+        </div>
+        <a
+          href={localeUrl(lang, 'testimonials')}
+          class="group inline-flex items-center gap-2 font-semibold text-accent hover:text-accent-hi transition-colors"
+        >
+          All testimonials
+          <span aria-hidden="true" class="transition-transform group-hover:translate-x-1">→</span>
+        </a>
+      </div>
+
+      <ul class="grid gap-6 md:grid-cols-2">
+        {
+          testimonials.map((tm) => (
+            <li class="flex flex-col bg-surface border border-ink-300/60 p-8 lg:p-10">
+              {/* Filo magenta: mismo motivo del moño del logo. */}
+              <span class="block w-10 h-[3px] bg-accent" aria-hidden="true" />
+              <blockquote class="mt-6 flex-1">
+                <p class="font-heading text-lg lg:text-xl leading-snug">{tm.data.quote}</p>
+              </blockquote>
+              <footer class="mt-8 pt-6 border-t border-ink-300/60">
+                <p class="font-semibold">{tm.data.author}</p>
+                <p class="text-sm text-ink-600">
+                  {tm.data.company}
+                  <span class="mx-1.5 text-ink-300">·</span>
+                  <span class="font-medium text-accent">
+                    {tm.data.city}, {tm.data.province}
+                  </span>
+                </p>
+              </footer>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  {/* VIDEOS — thumbnails reales de YouTube, sin embeber el iframe (peso y privacidad). */}
+  <section class="py-20 lg:py-28">
+    <div class="mx-auto max-w-[1280px] px-6 lg:px-10">
+      <div class="flex flex-wrap items-end justify-between gap-6 mb-14">
+        <div class="max-w-2xl">
+          <p class="eyebrow text-accent mb-4">See them run</p>
+          <h2 class="text-3xl lg:text-4xl">Machines in production, not in a brochure</h2>
+        </div>
+        <a
+          href={localeUrl(lang, 'videos')}
+          class="group inline-flex items-center gap-2 font-semibold text-accent hover:text-accent-hi transition-colors"
+        >
+          All videos
+          <span aria-hidden="true" class="transition-transform group-hover:translate-x-1">→</span>
+        </a>
+      </div>
+
+      <ul class="grid gap-8 md:grid-cols-3">
+        {
+          videos.map((v) => (
+            <li>
+              <a href={v.data.url} target="_blank" rel="noopener noreferrer" class="group block">
+                <div class="relative aspect-video overflow-hidden bg-ink-900">
+                  <img
+                    src={`https://i.ytimg.com/vi/${v.data.youtubeId}/hqdefault.jpg`}
+                    alt=""
+                    loading="lazy"
+                    width="480"
+                    height="360"
+                    class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                  />
+                  <span class="absolute inset-0 flex items-center justify-center" aria-hidden="true">
+                    <span class="flex items-center justify-center w-14 h-14 rounded-full bg-accent/90 group-hover:bg-accent transition-colors">
+                      <svg viewBox="0 0 24 24" class="w-6 h-6 translate-x-0.5 fill-white">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </span>
+                  </span>
+                </div>
+                {v.data.machineModel && (
+                  <span class="mt-5 block font-heading text-xs font-bold tracking-widest text-accent">
+                    {v.data.machineModel}
+                  </span>
+                )}
+                <h3 class="mt-2 font-semibold group-hover:text-accent transition-colors">
+                  {v.data.title}
+                </h3>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  {/* CTA FINAL */}
+  <section class="bg-ink-900">
+    <div class="mx-auto max-w-[1280px] px-6 lg:px-10 py-20 lg:py-24">
+      <div class="grid gap-10 lg:grid-cols-[1.5fr_1fr] lg:items-end">
+        <div>
+          <p class="eyebrow text-accent-on-dark mb-5">Tell us what you pack</p>
+          <h2 class="text-white text-3xl lg:text-5xl leading-tight">
+            Send us your product and we will recommend the machine.
+          </h2>
+          <p class="mt-6 text-ink-300 max-w-xl leading-relaxed">
+            Bars, cookies, candies, produce, hardware — if it needs a sealed pack, there
+            is a configuration for it. Installation and operator training included.
+          </p>
+        </div>
+        <div class="flex flex-col gap-4 lg:items-end">
+          <a
+            href={localeUrl(lang, 'quote')}
+            class="inline-flex items-center justify-center rounded-sm bg-accent px-8 py-4 font-semibold text-white hover:bg-accent-hi transition-colors"
+          >
+            Get a Quote
+          </a>
+          <a
+            href={`tel:${company.locations[0]!.phoneHref}`}
+            class="inline-flex items-center justify-center px-2 py-2 font-semibold text-white hover:text-accent-on-dark transition-colors"
+          >
+            {company.locations[0]!.phone}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

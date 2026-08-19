@@ -1,0 +1,220 @@
+---
+import { company } from '../data/company';
+import { getLangFromUrl, useTranslations, switchLocalePath, localeUrl, type Lang } from '../i18n/ui';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const nav = [
+  { href: localeUrl(lang, 'products'), label: t('nav.products') },
+  { href: localeUrl(lang, 'services'), label: t('nav.services') },
+  { href: localeUrl(lang, 'testimonials'), label: t('nav.testimonials') },
+  { href: localeUrl(lang, 'videos'), label: t('nav.videos') },
+];
+
+const current = Astro.url.pathname;
+const other: Lang = lang === 'en' ? 'fr' : 'en';
+const phones = company.locations.filter((l) => l.phone);
+
+/*
+  El logo del cliente es un JPG con fondo blanco horneado, así que el header va claro
+  por obligación. Se aprovecha: header claro sobre hero oscuro corta fuerte en el fold.
+
+  Utility bar oscura arriba (no sticky, se va con el scroll) con los teléfonos:
+  en maquinaria industrial B2B el teléfono es un CTA real, no un dato de contacto.
+  Además refuerza visualmente la presencia Ontario + Québec en el primer vistazo.
+*/
+---
+
+<div class="hidden md:block bg-ink-900 text-ink-300">
+  <div class="mx-auto max-w-[1280px] px-6 lg:px-10">
+    <div class="flex items-center justify-end gap-6 h-9 text-xs">
+      <span class="eyebrow text-accent-on-dark">{t('nav.callUs')}</span>
+      {phones.map((loc) => (
+        <a
+          href={`tel:${loc.phoneHref}`}
+          class="hover:text-white transition-colors whitespace-nowrap"
+        >
+          <span class="text-ink-300/60">{loc.region}</span>
+          <span class="ml-2 font-medium text-white">{loc.phone}</span>
+        </a>
+      ))}
+      <a
+        href={`mailto:${company.email}`}
+        class="hidden lg:inline hover:text-white transition-colors"
+      >
+        {company.email}
+      </a>
+    </div>
+  </div>
+</div>
+
+<header class="sticky top-0 z-50 bg-surface/95 backdrop-blur-sm border-b border-ink-300/60">
+  <!-- Filo magenta: la curva del moño del logo, reducida a una regla. -->
+  <div class="h-[3px] bg-accent"></div>
+
+  <div class="mx-auto max-w-[1280px] px-6 lg:px-10">
+    <div class="flex items-center gap-6 h-20">
+      <a href={localeUrl(lang)} class="shrink-0" aria-label={company.name}>
+        <img
+          src={company.logo}
+          alt={company.name}
+          width="1536"
+          height="412"
+          class="h-9 w-auto md:h-11"
+        />
+      </a>
+
+      <nav class="hidden lg:flex items-center gap-1 ml-auto" aria-label="Main">
+        {nav.map((item) => {
+          const active = current.startsWith(item.href);
+          return (
+            <a
+              href={item.href}
+              aria-current={active ? 'page' : undefined}
+              class:list={[
+                'relative px-4 py-2 text-sm font-medium transition-colors',
+                active ? 'text-accent' : 'text-ink-600 hover:text-ink-900',
+              ]}
+            >
+              {item.label}
+              {active && <span class="absolute inset-x-4 -bottom-[1px] h-[2px] bg-accent"></span>}
+            </a>
+          );
+        })}
+      </nav>
+
+      <div class="flex items-center gap-3 ml-auto lg:ml-0">
+        <!-- Selector de idioma: mantiene la ruta actual, solo cambia el locale. -->
+        <div class="flex items-center text-xs font-semibold" aria-label={t('nav.language')}>
+          <span class="px-2 py-1 text-ink-900 border border-ink-300 bg-surface-2" aria-current="true">
+            {lang.toUpperCase()}
+          </span>
+          <a
+            href={switchLocalePath(Astro.url, other)}
+            class="px-2 py-1 text-ink-600 border border-l-0 border-ink-300 hover:text-accent hover:border-accent transition-colors"
+          >
+            {other.toUpperCase()}
+          </a>
+        </div>
+
+        <a
+          href={localeUrl(lang, 'quote')}
+          class="hidden sm:inline-flex items-center rounded-sm bg-accent px-5 py-2.5 text-sm font-semibold text-white hover:bg-accent-hi transition-colors"
+        >
+          {t('nav.quote')}
+        </a>
+
+        <button
+          type="button"
+          id="nav-toggle"
+          class="lg:hidden inline-flex items-center justify-center w-10 h-10 -mr-2 text-ink-900"
+          aria-expanded="false"
+          aria-controls="nav-panel"
+          aria-label={t('nav.open')}
+          data-label-open={t('nav.open')}
+          data-label-close={t('nav.close')}
+        >
+          <span class="sr-only">{t('nav.menu')}</span>
+          <span aria-hidden="true" class="relative block w-6 h-4">
+            <span class="nav-bar absolute inset-x-0 top-0 h-[2px] bg-current"></span>
+            <span class="nav-bar absolute inset-x-0 top-1/2 -translate-y-1/2 h-[2px] bg-current"></span>
+            <span class="nav-bar absolute inset-x-0 bottom-0 h-[2px] bg-current"></span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel mobile. Oculto por defecto; el script de abajo lo togglea. -->
+  <div
+    id="nav-panel"
+    hidden
+    class="lg:hidden border-t border-ink-300/60 bg-surface"
+  >
+    <nav class="mx-auto max-w-[1280px] px-6 py-6" aria-label="Mobile">
+      <ul class="divide-y divide-ink-300/50">
+        {nav.map((item) => {
+          const active = current.startsWith(item.href);
+          return (
+            <li>
+              <a
+                href={item.href}
+                aria-current={active ? 'page' : undefined}
+                class:list={[
+                  'flex items-center gap-3 py-4 font-heading text-lg font-semibold transition-colors',
+                  active ? 'text-accent' : 'text-ink-900 hover:text-accent',
+                ]}
+              >
+                {active && <span class="w-1 h-5 bg-accent"></span>}
+                {item.label}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+
+      <a
+        href={localeUrl(lang, 'quote')}
+        class="mt-6 flex items-center justify-center rounded-sm bg-accent px-5 py-3.5 text-sm font-semibold text-white hover:bg-accent-hi transition-colors"
+      >
+        {t('nav.quote')}
+      </a>
+
+      <div class="mt-6 pt-6 border-t border-ink-300/50 space-y-3">
+        {phones.map((loc) => (
+          <a href={`tel:${loc.phoneHref}`} class="flex items-baseline justify-between text-sm">
+            <span class="text-ink-600">{loc.region}</span>
+            <span class="font-semibold text-ink-900">{loc.phone}</span>
+          </a>
+        ))}
+        <a
+          href={`mailto:${company.email}`}
+          class="block text-sm text-ink-600 hover:text-accent transition-colors break-all"
+        >
+          {company.email}
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const toggle = document.getElementById('nav-toggle');
+  const panel = document.getElementById('nav-panel');
+
+  if (toggle && panel) {
+    /*
+      El script solo cambia aria-expanded; la animación hamburguesa → X vive en
+      global.css colgada de ese atributo. Ver el comentario ahí: las clases de
+      Tailwind aplicadas desde JS no se generan, porque el scanner no las ve.
+    */
+    const setOpen = (open: boolean) => {
+      panel.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute(
+        'aria-label',
+        (open ? toggle.dataset.labelClose : toggle.dataset.labelOpen) ?? '',
+      );
+      // Bloquea el scroll del fondo mientras el panel está abierto.
+      document.documentElement.style.overflow = open ? 'hidden' : '';
+    };
+
+    toggle.addEventListener('click', () => {
+      setOpen(panel.hidden);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !panel.hidden) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    // Si se vuelve a desktop con el panel abierto, restaurar el estado.
+    const desktop = window.matchMedia('(min-width: 1024px)');
+    desktop.addEventListener('change', (e) => {
+      if (e.matches && !panel.hidden) setOpen(false);
+    });
+  }
+</script>
