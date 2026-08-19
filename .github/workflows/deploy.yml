@@ -26,6 +26,9 @@ jobs:
 
       - name: Install, build and upload
         uses: withastro/action@v3
+        with:
+          # Astro 7 exige >=22.12; el default de la action es Node 20 y falla el build.
+          node-version: 22
 
   deploy:
     needs: build
