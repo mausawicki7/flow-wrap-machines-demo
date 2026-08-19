@@ -49,6 +49,22 @@
     scroll-behavior: smooth;
   }
 
+  /* Respetar a quien pidió menos movimiento: el sitio es una sola página larga
+     y el scroll animado es justamente lo que molesta con vestibular disorders. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
   body {
     font-family: var(--font-body);
     color: var(--color-ink-900);
@@ -145,5 +161,138 @@
   .rich-text strong {
     color: var(--color-ink-900);
     font-weight: 600;
+  }
+
+  /*
+    Links del nav. El estado activo se maneja por data-active en vez de clases,
+    porque lo setea el scrollspy desde JS y Tailwind no genera lo que no ve en el
+    markup. Sirve para los dos casos: la página de Productos lo marca desde el
+    servidor y las anclas de la Home desde el observer.
+  */
+  .nav-link {
+    position: relative;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-ink-600);
+    transition: color 150ms ease;
+  }
+
+  .nav-link:hover {
+    color: var(--color-ink-900);
+  }
+
+  .nav-link[data-active='true'] {
+    color: var(--color-accent);
+  }
+
+  .nav-underline {
+    position: absolute;
+    left: 1rem;
+    right: 1rem;
+    bottom: -1px;
+    height: 2px;
+    background: var(--color-accent);
+    scale: 0 1;
+    transition: scale 180ms ease;
+  }
+
+  .nav-link[data-active='true'] .nav-underline {
+    scale: 1 1;
+  }
+
+  .nav-link-mobile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 0;
+    font-family: var(--font-heading);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-ink-900);
+    transition: color 150ms ease;
+  }
+
+  .nav-link-mobile[data-active='true'] {
+    color: var(--color-accent);
+  }
+
+  .nav-marker {
+    width: 3px;
+    height: 1.25rem;
+    background: var(--color-accent);
+    opacity: 0;
+    transition: opacity 150ms ease;
+  }
+
+  .nav-link-mobile[data-active='true'] .nav-marker {
+    opacity: 1;
+  }
+
+  /*
+    Campos del formulario de cotización. Se define acá y no con utilidades sueltas
+    en cada input: son treinta y pico de campos y repetir la cadena de clases en
+    cada uno garantiza que tarde o temprano queden desalineados.
+    Bordes rectos y foco magenta, consistente con el resto del sitio.
+  */
+  /*
+    Hijo directo a propósito: las etiquetas de los radios (.choice) van anidadas
+    dentro de un div, y si esta regla las alcanzara les ganaría por especificidad
+    y les impondría display:block, matando el gap entre el control y su texto.
+  */
+  .field > label,
+  .field > .field-label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-ink-900);
+    margin-bottom: 0.5rem;
+  }
+
+  .field input[type='text'],
+  .field input[type='email'],
+  .field input[type='tel'],
+  .field textarea {
+    width: 100%;
+    padding: 0.75rem 0.875rem;
+    font: inherit;
+    font-size: 0.9375rem;
+    color: var(--color-ink-900);
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-ink-300);
+    border-radius: 2px;
+    transition: border-color 150ms ease;
+  }
+
+  .field textarea {
+    resize: vertical;
+  }
+
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: var(--color-ink-600);
+    opacity: 0.6;
+  }
+
+  .field input:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 15%, transparent);
+  }
+
+  .choice {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9375rem;
+    color: var(--color-ink-600);
+    cursor: pointer;
+  }
+
+  .choice input {
+    accent-color: var(--color-accent);
+    width: 1rem;
+    height: 1rem;
   }
 }

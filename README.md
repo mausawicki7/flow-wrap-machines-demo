@@ -17,22 +17,32 @@ ilustrar la propuesta de diseño.
 - Estructura de contenido en Astro Content Collections, lista para escalar
 - Enfoque de i18n EN/FR con el router nativo de Astro, incluyendo hreflang por idioma
 
-## Estado
+## Estructura
 
-| Página       | Estado                                                    |
-| ------------ | --------------------------------------------------------- |
-| Home         | Completa (EN)                                              |
-| Products     | Completa (EN) — 6 categorías con índice lateral            |
-| Services     | Stub                                                       |
-| Testimonials | Completa (EN) — los 9 testimonios en grilla               |
-| Videos       | Stub — los 3 videos reales ya cargados                     |
-| Get a Quote  | Stub                                                       |
-| Francés      | Chrome traducido; contenido de páginas pendiente           |
+La Home concentra todo el contenido y el menú son anclas a sus secciones. La única
+excepción es **Productos**, que tiene página propia: es la sección con más contenido
+y la que más valor tiene como URL indexable por separado.
+
+| Sección / página        | Estado                                                  |
+| ----------------------- | ------------------------------------------------------- |
+| Home — hero + stats     | Completa (EN)                                            |
+| Home — `#products`      | Completa (EN) — intro a la página de Productos           |
+| Home — `#services`      | Completa (EN) — copy propuesto, sin validar              |
+| Home — `#testimonials`  | Completa (EN) — los 9 testimonios reales                 |
+| Home — `#videos`        | Completa (EN) — los 3 videos reales                      |
+| Home — `#quote`         | Completa (EN) — formulario UI, no envía                  |
+| /products/              | Completa (EN) — 6 categorías con índice lateral          |
+| Francés                 | Chrome traducido; contenido de las páginas pendiente     |
+
+Para el sitio real en WordPress probablemente convenga que Servicios y Testimonios
+sean páginas propias — una one-pager pierde URLs para rankear y el pedido incluye
+SEO on-page. Como el contenido vive en collections, dividirlo después es trivial.
 
 Cuatro de las seis categorías de producto (Roll Film, Stand-up Bag, Box/Carton,
 Carry Card) no tienen contenido en el sitio actual. Están marcadas con
 `contentNeeded: true` y comentarios `<!-- CONTENT NEEDED FROM CLIENT -->`: el copy es
 propuesta de cómo se leería la sección, no información verificada de la empresa.
+Lo mismo aplica a los cuatro servicios.
 
 ## Stack
 
@@ -60,6 +70,9 @@ npm run build    # salida estática en dist/
 - **Los links internos van por `localeUrl()` / `withBase()`** de `src/i18n/ui.ts`.
   El sitio se sirve bajo un subdirectorio en GitHub Pages, así que escribir
   `/en/products/` a mano funciona en local y rompe en producción.
+- **El menú se define una sola vez** en `src/data/nav.ts`, porque Header y Footer
+  tienen que coincidir. El estado activo se maneja con `data-active` (scrollspy), no
+  con clases.
 - **No apliques clases de Tailwind desde JavaScript.** Tailwind v4 escanea el markup
   para generar el CSS y no ve los nombres de clase que solo existen dentro de un
   `<script>`: la clase entra al `classList` pero la regla nunca se emite.

@@ -1,6 +1,7 @@
 ---
 import { company } from '../data/company';
-import { getLangFromUrl, useTranslations, localeUrl } from '../i18n/ui';
+import { getLangFromUrl, useTranslations } from '../i18n/ui';
+import { getNav, getQuoteHref } from '../data/nav';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -13,11 +14,8 @@ const labels: Record<string, string> = {
 };
 
 const nav = [
-  { href: localeUrl(lang, 'products'), label: t('nav.products') },
-  { href: localeUrl(lang, 'services'), label: t('nav.services') },
-  { href: localeUrl(lang, 'testimonials'), label: t('nav.testimonials') },
-  { href: localeUrl(lang, 'videos'), label: t('nav.videos') },
-  { href: localeUrl(lang, 'quote'), label: t('nav.quote') },
+  ...getNav(lang, t as (key: string) => string),
+  { section: 'quote', href: getQuoteHref(lang), label: t('nav.quote') },
 ];
 ---
 

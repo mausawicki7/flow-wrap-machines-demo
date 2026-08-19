@@ -3,21 +3,49 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { company } from '../../data/company';
 import { byLocale, localeUrl, withBase } from '../../i18n/ui';
+import { getQuoteHref } from '../../data/nav';
 import TestimonialCard from '../../components/TestimonialCard.astro';
+import QuoteForm from '../../components/QuoteForm.astro';
 
 const lang = 'en';
 
 const products = byLocale(await getCollection('products'), lang).sort(
   (a, b) => a.data.order - b.data.order,
 );
-const testimonials = byLocale(await getCollection('testimonials'), lang)
-  .filter((t) => t.data.featured)
-  .sort((a, b) => a.data.order - b.data.order);
+const testimonials = byLocale(await getCollection('testimonials'), lang).sort(
+  (a, b) => a.data.order - b.data.order,
+);
 const videos = byLocale(await getCollection('videos'), lang).sort(
   (a, b) => a.data.order - b.data.order,
 );
 
 const slug = (id: string) => id.split('/')[1]!.replace(/^\d+-/, '');
+const productsHref = localeUrl(lang, 'products');
+const quoteHref = getQuoteHref(lang);
+
+/*
+  Servicios no existe en el sitio actual del cliente y no hay contenido real que
+  tomar. Este copy es propuesta de industria, bien escrito pero sin validar.
+*/
+// PLACEHOLDER: content needed from client
+const services = [
+  {
+    title: 'Installation & commissioning',
+    body: 'We deliver, install and commission the machine on your floor, running your own product through it until the seal and the speed are where they need to be.',
+  },
+  {
+    title: 'Operator training',
+    body: 'Your team is trained on the machine they will actually run — changeovers, film loading, temperature and speed settings, and routine cleaning.',
+  },
+  {
+    title: 'After-sales support & parts',
+    body: 'Support from Ontario and Québec, not overseas. Wear parts and consumables are stocked, so a stopped line does not wait on a container.',
+  },
+  {
+    title: 'Custom configuration',
+    body: 'Feeders, date coders, printers, gas flush and modified pack formats are configured in our own plant before the machine ships to you.',
+  },
+];
 ---
 
 <BaseLayout
@@ -37,8 +65,7 @@ const slug = (id: string) => id.split('/')[1]!.replace(/^\d+-/, '');
       loop
       playsinline
       aria-hidden="true"
-      tabindex="-1"
-    ></video>
+      tabindex="-1"></video>
     {/*
       Degradé para garantizar contraste del texto sobre cualquier frame del video.
       Calibrado para el peor caso (frame casi blanco): con el video al 60% y el velo
@@ -67,13 +94,13 @@ const slug = (id: string) => id.split('/')[1]!.replace(/^\d+-/, '');
         </p>
         <div class="mt-10 flex flex-wrap items-center gap-4">
           <a
-            href={localeUrl(lang, 'quote')}
+            href={quoteHref}
             class="inline-flex items-center rounded-sm bg-accent px-7 py-4 font-semibold text-white hover:bg-accent-hi transition-colors"
           >
             Get a Quote
           </a>
           <a
-            href={localeUrl(lang, 'products')}
+            href={productsHref}
             class="inline-flex items-center rounded-sm border border-white/30 px-7 py-4 font-semibold text-white hover:border-white hover:bg-white/5 transition-colors"
           >
             See the range
@@ -111,19 +138,25 @@ const slug = (id: string) => id.split('/')[1]!.replace(/^\d+-/, '');
   </section>
 
   {/*
-    LÍNEAS DE PRODUCTO — grid asimétrico: la primera tarjeta ocupa el doble porque
-    el flow-wrap horizontal es el producto insignia y el único con contenido real fuerte.
+    LÍNEAS DE PRODUCTO — introducción a la única sección con página propia, así que
+    cada tarjeta lleva a su ancla dentro de /products/.
+    Grid asimétrico: la primera ocupa el doble porque es el producto insignia.
     Sin imágenes falsas: tratamiento tipográfico con índice numerado.
   */}
-  <section class="py-20 lg:py-28">
+  <section id="products" class="scroll-mt-28 py-20 lg:py-28">
     <div class="mx-auto max-w-[1280px] px-6 lg:px-10">
       <div class="flex flex-wrap items-end justify-between gap-6 mb-14">
         <div class="max-w-2xl">
           <p class="eyebrow text-accent mb-4">Product lines</p>
           <h2 class="text-3xl lg:text-4xl">Six ranges, one plant behind them</h2>
+          <p class="mt-4 text-ink-600 leading-relaxed">
+            Over 50 models, from single-product flow-wrappers through to large vertical
+            baggers — each one rebuilt with North American and German components before
+            it ships.
+          </p>
         </div>
         <a
-          href={localeUrl(lang, 'products')}
+          href={productsHref}
           class="group inline-flex items-center gap-2 font-semibold text-accent hover:text-accent-hi transition-colors"
         >
           All products
@@ -138,7 +171,7 @@ const slug = (id: string) => id.split('/')[1]!.replace(/^\d+-/, '');
           products.map((p, i) => (
             <li class:list={['bg-surface', i === 0 && 'sm:col-span-2']}>
               <a
-                href={`${localeUrl(lang, 'products')}#${slug(p.id)}`}
+                href={`${productsHref}#${slug(p.id)}`}
                 class="group flex h-full flex-col p-8 lg:p-10 hover:bg-surface-2 transition-colors"
               >
                 <span class="font-heading text-sm font-bold text-accent">
@@ -167,28 +200,70 @@ const slug = (id: string) => id.split('/')[1]!.replace(/^\d+-/, '');
     </div>
   </section>
 
-  {/* TESTIMONIOS — ciudad destacada: refuerza la presencia Ontario + Québec. */}
-  <section class="bg-surface-2 border-y border-ink-300/60 py-20 lg:py-28">
+  {/*
+    SERVICIOS — sección nueva, no existe en el sitio actual.
+    Franjas horizontales numeradas en vez de cuatro tarjetas iguales con ícono,
+    que es exactamente el patrón de Elementor que estamos evitando.
+  */}
+  <section id="services" class="scroll-mt-28 bg-ink-900 py-20 lg:py-28">
     <div class="mx-auto max-w-[1280px] px-6 lg:px-10">
-      <div class="flex flex-wrap items-end justify-between gap-6 mb-14">
-        <div class="max-w-2xl">
-          <p class="eyebrow text-accent mb-4">From the floor</p>
-          <h2 class="text-3xl lg:text-4xl">What operators say after the install</h2>
-        </div>
-        <a
-          href={localeUrl(lang, 'testimonials')}
-          class="group inline-flex items-center gap-2 font-semibold text-accent hover:text-accent-hi transition-colors"
-        >
-          All testimonials
-          <span aria-hidden="true" class="transition-transform group-hover:translate-x-1">→</span>
-        </a>
+      <div class="max-w-2xl mb-14">
+        <p class="eyebrow text-accent-on-dark mb-4">Services</p>
+        <h2 class="text-white text-3xl lg:text-4xl">
+          The machine is half of it. The other half is what happens after.
+        </h2>
       </div>
 
-      <ul class="grid gap-6 md:grid-cols-2">
+      <ul class="border-t border-white/10">
+        {
+          services.map((service, i) => (
+            <li class="border-b border-white/10">
+              <div class="grid gap-4 py-8 lg:grid-cols-[80px_1fr_1.4fr] lg:items-baseline lg:gap-10 lg:py-10">
+                <span class="font-heading text-sm font-bold text-accent-on-dark">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <h3 class="text-white text-xl lg:text-2xl">{service.title}</h3>
+                <p class="text-ink-300 leading-relaxed">{service.body}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+
+      <p class="mt-10 max-w-3xl text-sm text-ink-300/60 leading-relaxed">
+        <span class="font-semibold text-ink-300">A note on this concept:</span> the current
+        website has no services section, so the four above are a proposal of what it would
+        cover. They need to be confirmed against how D.T. actually works before publication.
+      </p>
+    </div>
+  </section>
+
+  {/*
+    TESTIMONIOS — los nueve, en grilla y no en carrusel. Para un comprador B2B el
+    volumen es parte del argumento, y un carrusel esconde ocho de los nueve detrás
+    de una interacción que casi nadie hace.
+  */}
+  <section
+    id="testimonials"
+    class="scroll-mt-28 bg-surface-2 border-y border-ink-300/60 py-20 lg:py-28"
+  >
+    <div class="mx-auto max-w-[1280px] px-6 lg:px-10">
+      <div class="max-w-2xl mb-14">
+        <p class="eyebrow text-accent mb-4">From the floor</p>
+        <h2 class="text-3xl lg:text-4xl">
+          {testimonials.length} operators, in their own words
+        </h2>
+        <p class="mt-4 text-ink-600 leading-relaxed">
+          Bakeries, chocolate makers, candy producers and a dental supply company across
+          Ontario, Québec and the United States. Unedited, exactly as they were given to us.
+        </p>
+      </div>
+
+      <ul class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {
           testimonials.map((tm) => (
             <li>
-              <TestimonialCard {...tm.data} featured />
+              <TestimonialCard {...tm.data} />
             </li>
           ))
         }
@@ -197,7 +272,7 @@ const slug = (id: string) => id.split('/')[1]!.replace(/^\d+-/, '');
   </section>
 
   {/* VIDEOS — thumbnails reales de YouTube, sin embeber el iframe (peso y privacidad). */}
-  <section class="py-20 lg:py-28">
+  <section id="videos" class="scroll-mt-28 py-20 lg:py-28">
     <div class="mx-auto max-w-[1280px] px-6 lg:px-10">
       <div class="flex flex-wrap items-end justify-between gap-6 mb-14">
         <div class="max-w-2xl">
@@ -205,10 +280,12 @@ const slug = (id: string) => id.split('/')[1]!.replace(/^\d+-/, '');
           <h2 class="text-3xl lg:text-4xl">Machines in production, not in a brochure</h2>
         </div>
         <a
-          href={localeUrl(lang, 'videos')}
+          href="https://youtube.com/@flowwrapmachines"
+          target="_blank"
+          rel="noopener noreferrer"
           class="group inline-flex items-center gap-2 font-semibold text-accent hover:text-accent-hi transition-colors"
         >
-          All videos
+          More on YouTube
           <span aria-hidden="true" class="transition-transform group-hover:translate-x-1">→</span>
         </a>
       </div>
@@ -251,35 +328,6 @@ const slug = (id: string) => id.split('/')[1]!.replace(/^\d+-/, '');
     </div>
   </section>
 
-  {/* CTA FINAL */}
-  <section class="bg-ink-900">
-    <div class="mx-auto max-w-[1280px] px-6 lg:px-10 py-20 lg:py-24">
-      <div class="grid gap-10 lg:grid-cols-[1.5fr_1fr] lg:items-end">
-        <div>
-          <p class="eyebrow text-accent-on-dark mb-5">Tell us what you pack</p>
-          <h2 class="text-white text-3xl lg:text-5xl leading-tight">
-            Send us your product and we will recommend the machine.
-          </h2>
-          <p class="mt-6 text-ink-300 max-w-xl leading-relaxed">
-            Bars, cookies, candies, produce, hardware — if it needs a sealed pack, there
-            is a configuration for it. Installation and operator training included.
-          </p>
-        </div>
-        <div class="flex flex-col gap-4 lg:items-end">
-          <a
-            href={localeUrl(lang, 'quote')}
-            class="inline-flex items-center justify-center rounded-sm bg-accent px-8 py-4 font-semibold text-white hover:bg-accent-hi transition-colors"
-          >
-            Get a Quote
-          </a>
-          <a
-            href={`tel:${company.locations[0]!.phoneHref}`}
-            class="inline-flex items-center justify-center px-2 py-2 font-semibold text-white hover:text-accent-on-dark transition-colors"
-          >
-            {company.locations[0]!.phone}
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
+  {/* COTIZACIÓN — el formulario vive en la Home, sin cambio de página. */}
+  <QuoteForm />
 </BaseLayout>
