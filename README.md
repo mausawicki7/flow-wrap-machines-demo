@@ -22,9 +22,9 @@ ilustrar la propuesta de diseño.
 | Página       | Estado                                                    |
 | ------------ | --------------------------------------------------------- |
 | Home         | Completa (EN)                                              |
-| Products     | Stub — 6 categorías cargadas en las collections            |
+| Products     | Completa (EN) — 6 categorías con índice lateral            |
 | Services     | Stub                                                       |
-| Testimonials | Stub — los 9 testimonios reales ya cargados                |
+| Testimonials | Completa (EN) — los 9 testimonios en grilla               |
 | Videos       | Stub — los 3 videos reales ya cargados                     |
 | Get a Quote  | Stub                                                       |
 | Francés      | Chrome traducido; contenido de páginas pendiente           |

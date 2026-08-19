@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { company } from '../../data/company';
 import { byLocale, localeUrl, withBase } from '../../i18n/ui';
+import TestimonialCard from '../../components/TestimonialCard.astro';
 
 const lang = 'en';
 
@@ -186,22 +187,8 @@ const slug = (id: string) => id.split('/')[1]!.replace(/^\d+-/, '');
       <ul class="grid gap-6 md:grid-cols-2">
         {
           testimonials.map((tm) => (
-            <li class="flex flex-col bg-surface border border-ink-300/60 p-8 lg:p-10">
-              {/* Filo magenta: mismo motivo del moño del logo. */}
-              <span class="block w-10 h-[3px] bg-accent" aria-hidden="true" />
-              <blockquote class="mt-6 flex-1">
-                <p class="font-heading text-lg lg:text-xl leading-snug">{tm.data.quote}</p>
-              </blockquote>
-              <footer class="mt-8 pt-6 border-t border-ink-300/60">
-                <p class="font-semibold">{tm.data.author}</p>
-                <p class="text-sm text-ink-600">
-                  {tm.data.company}
-                  <span class="mx-1.5 text-ink-300">·</span>
-                  <span class="font-medium text-accent">
-                    {tm.data.city}, {tm.data.province}
-                  </span>
-                </p>
-              </footer>
+            <li>
+              <TestimonialCard {...tm.data} featured />
             </li>
           ))
         }

@@ -1,14 +1,89 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { byLocale, localeUrl } from '../../i18n/ui';
+import TestimonialCard from '../../components/TestimonialCard.astro';
+
+const lang = 'en';
+
+const testimonials = byLocale(await getCollection('testimonials'), lang).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+/*
+  Se cuentan las provincias/estados representados en lugar de escribirlos a mano:
+  si mañana se suma un testimonio de otra región, el número se corrige solo.
+*/
+const regions = new Set(testimonials.map((t) => t.data.province.replace('.', '')));
+const quebecCount = testimonials.filter((t) => t.data.province.startsWith('Qc')).length;
 ---
 
 <BaseLayout
   title="Testimonials | D.T. Flow Wrap Machines"
   description="What operators across Ontario, Québec and the United States say about running a D.T. machine."
 >
-  {/* STUB — el contenido real de esta página se construye en el siguiente paso. */}
-  <section class="mx-auto max-w-[1280px] px-6 lg:px-10 py-24">
-    <p class="eyebrow text-accent mb-4">D.T. Flow Wrap Machines</p>
-    <h1 class="text-4xl md:text-6xl">Testimonials</h1>
+  {/* CABECERA */}
+  <section class="bg-ink-900">
+    <div class="mx-auto max-w-[1280px] px-6 lg:px-10 py-16 lg:py-24">
+      <p class="eyebrow text-accent-on-dark mb-5">From the floor</p>
+      <h1 class="text-white text-4xl lg:text-6xl leading-[1.05] max-w-4xl">
+        {testimonials.length} operators, in their own words
+      </h1>
+      <p class="mt-7 text-lg text-ink-300 max-w-2xl leading-relaxed">
+        Bakeries, chocolate makers, candy producers and a dental supply company —
+        across {regions.size} provinces and states, {quebecCount} of them in Québec.
+        These are unedited, exactly as they were given to us.
+      </p>
+    </div>
+  </section>
+
+  {/*
+    Grilla, no carrusel. Para un comprador B2B el volumen es parte del argumento:
+    ver nueve testimonios a la vez pesa más que verlos de a uno, y un carrusel
+    esconde ocho de los nueve detrás de una interacción que casi nadie hace.
+  */}
+  <section class="bg-surface-2 border-y border-ink-300/60 py-16 lg:py-24">
+    <div class="mx-auto max-w-[1280px] px-6 lg:px-10">
+      <ul class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {
+          testimonials.map((tm) => (
+            <li>
+              <TestimonialCard {...tm.data} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  {/* CTA */}
+  <section class="bg-ink-900">
+    <div class="mx-auto max-w-[1280px] px-6 lg:px-10 py-16 lg:py-20">
+      <div class="flex flex-wrap items-end justify-between gap-8">
+        <div class="max-w-2xl">
+          <h2 class="text-white text-3xl lg:text-4xl leading-tight">
+            Your line could be the next one on this page.
+          </h2>
+          <p class="mt-4 text-ink-300 leading-relaxed">
+            Installation, operator training and after-sales support come with every
+            machine we ship.
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-4">
+          <a
+            href={localeUrl(lang, 'quote')}
+            class="inline-flex items-center rounded-sm bg-accent px-8 py-4 font-semibold text-white hover:bg-accent-hi transition-colors"
+          >
+            Get a Quote
+          </a>
+          <a
+            href={localeUrl(lang, 'products')}
+            class="inline-flex items-center rounded-sm border border-white/30 px-8 py-4 font-semibold text-white hover:border-white hover:bg-white/5 transition-colors"
+          >
+            See the range
+          </a>
+        </div>
+      </div>
+    </div>
   </section>
 </BaseLayout>

@@ -1,0 +1,43 @@
+---
+/*
+  Tarjeta de testimonio, compartida entre la Home (destacados) y la página completa.
+  La ciudad va en magenta a propósito: la presencia Ontario + Québec es argumento
+  de venta, y verla repetida a lo largo de la grilla la vuelve evidente sin decirla.
+*/
+interface Props {
+  quote: string;
+  author: string;
+  company: string;
+  city: string;
+  province: string;
+  /** Cita más grande, para los destacados de la Home. */
+  featured?: boolean;
+}
+
+const { quote, author, company, city, province, featured = false } = Astro.props;
+---
+
+<figure class="flex h-full flex-col bg-surface border border-ink-300/60 p-8 lg:p-10">
+  {/* Filo magenta: mismo motivo del moño del logo. */}
+  <span class="block w-10 h-[3px] bg-accent" aria-hidden="true"></span>
+
+  <blockquote class="mt-6 flex-1">
+    <p
+      class:list={[
+        'font-heading leading-snug',
+        featured ? 'text-lg lg:text-xl' : 'text-lg',
+      ]}
+    >
+      {quote}
+    </p>
+  </blockquote>
+
+  <figcaption class="mt-8 pt-6 border-t border-ink-300/60">
+    <span class="block font-semibold">{author}</span>
+    <span class="block text-sm text-ink-600">
+      {company}
+      <span class="mx-1.5 text-ink-300">·</span>
+      <span class="font-medium text-accent">{city}, {province}</span>
+    </span>
+  </figcaption>
+</figure>

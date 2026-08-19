@@ -1,14 +1,168 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+import { byLocale, localeUrl } from '../../i18n/ui';
+
+const lang = 'en';
+
+const entries = byLocale(await getCollection('products'), lang).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+const slug = (id: string) => id.split('/')[1]!.replace(/^\d+-/, '');
+
+/*
+  El cuerpo de cada producto es markdown en la collection, así que hay que
+  renderizarlo. Se resuelve todo acá arriba para que el template quede plano.
+*/
+const products = await Promise.all(
+  entries.map(async (entry) => ({
+    entry,
+    anchor: slug(entry.id),
+    Content: (await render(entry)).Content,
+  })),
+);
+
+const withContent = products.filter((p) => !p.entry.data.contentNeeded).length;
 ---
 
 <BaseLayout
   title="Products | D.T. Flow Wrap Machines"
   description="Six ranges of packaging machinery: horizontal flow-wrap, vertical VFFS, roll film systems, stand-up bag, box and carton packing, and carry card packaging."
 >
-  {/* STUB — el contenido real de esta página se construye en el siguiente paso. */}
-  <section class="mx-auto max-w-[1280px] px-6 lg:px-10 py-24">
-    <p class="eyebrow text-accent mb-4">D.T. Flow Wrap Machines</p>
-    <h1 class="text-4xl md:text-6xl">Products</h1>
+  {/* CABECERA — más compacta que el hero de la Home; acá el usuario ya viene decidido. */}
+  <section class="bg-ink-900">
+    <div class="mx-auto max-w-[1280px] px-6 lg:px-10 py-16 lg:py-24">
+      <p class="eyebrow text-accent-on-dark mb-5">Product lines</p>
+      <h1 class="text-white text-4xl lg:text-6xl leading-[1.05] max-w-4xl">
+        Over 50 models across six ranges
+      </h1>
+      <p class="mt-7 text-lg text-ink-300 max-w-2xl leading-relaxed">
+        Every machine is imported from a selected supplier and rebuilt in our own plant
+        with North American and German components before it ships. CE certified.
+      </p>
+    </div>
+  </section>
+
+  <div class="mx-auto max-w-[1280px] px-6 lg:px-10 py-16 lg:py-24">
+    <div class="grid gap-12 lg:grid-cols-[240px_1fr] lg:gap-20">
+      {/*
+        Índice lateral pegajoso. Con seis secciones largas, un usuario B2B que busca
+        una categoría puntual no debería tener que scrollear a ciegas para encontrarla.
+      */}
+      <nav class="hidden lg:block" aria-label="Product ranges">
+        <div class="sticky top-32">
+          <p class="eyebrow text-ink-600 mb-5">Jump to</p>
+          <ul class="space-y-1 border-l border-ink-300">
+            {
+              products.map((p, i) => (
+                <li>
+                  <a
+                    href={`#${p.anchor}`}
+                    class="group flex gap-3 -ml-px border-l-2 border-transparent py-2 pl-4 text-sm text-ink-600 hover:border-accent hover:text-accent transition-colors"
+                  >
+                    <span class="font-heading font-bold text-ink-300 group-hover:text-accent transition-colors">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    {p.entry.data.title}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </nav>
+
+      <div class="min-w-0">
+        {
+          products.map((p, i) => (
+            <section
+              id={p.anchor}
+              class:list={[
+                /* scroll-mt compensa el header pegajoso al saltar por anchor. */
+                'scroll-mt-32 py-12 first:pt-0',
+                i > 0 && 'border-t border-ink-300/60',
+              ]}
+            >
+              <div class="flex items-baseline gap-4">
+                <span class="font-heading text-sm font-bold text-accent">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                {p.entry.data.contentNeeded && (
+                  <span class="inline-flex items-center rounded-sm border border-ink-300 bg-surface-2 px-2 py-1 text-xs font-medium text-ink-600">
+                    Proposed section
+                  </span>
+                )}
+              </div>
+
+              <h2 class="mt-4 text-3xl lg:text-4xl">{p.entry.data.title}</h2>
+              <p class="mt-4 text-lg text-ink-900/80 leading-relaxed max-w-2xl">
+                {p.entry.data.summary}
+              </p>
+
+              <div class="mt-8 max-w-2xl rich-text">
+                <p.Content />
+              </div>
+
+              {p.entry.data.videoUrl && (
+                <a
+                  href={p.entry.data.videoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="group mt-8 inline-flex items-center gap-3 font-semibold text-accent hover:text-accent-hi transition-colors"
+                >
+                  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-accent group-hover:bg-accent-hi transition-colors">
+                    <svg viewBox="0 0 24 24" class="h-4 w-4 translate-x-px fill-white">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </span>
+                  Watch this range running
+                </a>
+              )}
+            </section>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+
+  {/*
+    Nota de honestidad sobre el contenido provisorio. Va explícita en la página:
+    en una propuesta, marcar qué es dato del cliente y qué es propuesta propia
+    genera más confianza que dejar que lo descubran solos.
+  */}
+  <section class="bg-surface-2 border-t border-ink-300/60">
+    <div class="mx-auto max-w-[1280px] px-6 lg:px-10 py-12">
+      <p class="max-w-3xl text-sm text-ink-600 leading-relaxed">
+        <span class="font-semibold text-ink-900">A note on this concept:</span>
+        {' '}
+        {withContent} of the {products.length} ranges above use copy from the current
+        D.T. Flow Wrap Machines website. The rest are marked
+        <span class="font-medium text-ink-900"> Proposed section</span> — the copy shows
+        how they would read once model and specification details are provided.
+      </p>
+    </div>
+  </section>
+
+  {/* CTA */}
+  <section class="bg-ink-900">
+    <div class="mx-auto max-w-[1280px] px-6 lg:px-10 py-16 lg:py-20">
+      <div class="flex flex-wrap items-end justify-between gap-8">
+        <div class="max-w-2xl">
+          <h2 class="text-white text-3xl lg:text-4xl leading-tight">
+            Not sure which range fits your product?
+          </h2>
+          <p class="mt-4 text-ink-300 leading-relaxed">
+            Tell us what you need to pack and we will point you at the right machine.
+          </p>
+        </div>
+        <a
+          href={localeUrl(lang, 'quote')}
+          class="inline-flex items-center rounded-sm bg-accent px-8 py-4 font-semibold text-white hover:bg-accent-hi transition-colors"
+        >
+          Get a Quote
+        </a>
+      </div>
+    </div>
   </section>
 </BaseLayout>
