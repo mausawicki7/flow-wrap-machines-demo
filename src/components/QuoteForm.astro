@@ -4,11 +4,13 @@ import { company } from '../data/company';
 /*
   Formulario de cotización. Los campos son los mismos del formulario Elementor actual,
   reordenados en tres bloques — producto, empresa, contacto — en lugar de una lista
-  plana de trece campos. Un pedido de cotización industrial es largo por naturaleza;
-  agruparlo por tema hace que se lea como tres preguntas cortas y no como un trámite.
+  plana de trece campos.
 
-  El campo que más importa comercialmente ("what are you looking to pack?") va primero
-  y ocupa el ancho completo: es el que determina qué máquina se cotiza.
+  Los tres bloques van en columnas, no apilados. Quedan parejos (cuatro controles cada
+  uno), así que la altura del formulario pasa a ser la de un bloque en vez de la suma
+  de los tres, y de paso los tres pasos se leen de un vistazo. La intro va a lo ancho
+  arriba: como columna lateral dejaba un hueco enorme, porque son cuatro líneas de
+  texto al lado de un formulario mucho más alto.
 
   DEMO: no envía a ningún lado. El submit muestra un estado de confirmación simulado.
 */
@@ -17,115 +19,111 @@ const contactPhone = company.locations[0]!;
 
 <section id="quote" class="scroll-mt-28 bg-surface-2 border-t border-ink-300/60 py-20 lg:py-28">
   <div class="mx-auto max-w-[1280px] px-6 lg:px-10">
-    <div class="grid gap-12 lg:grid-cols-[1fr_1.6fr] lg:gap-20">
-      <div>
+    {/* Encabezado a lo ancho: texto a la izquierda, vías de contacto directas a la derecha. */}
+    <div class="flex flex-wrap items-end justify-between gap-8 mb-12">
+      <div class="max-w-2xl">
         <p class="eyebrow text-accent mb-4">Get a quote</p>
         <h2 class="text-3xl lg:text-4xl">Tell us what you pack</h2>
-        <p class="mt-5 text-ink-600 leading-relaxed">
+        <p class="mt-4 text-ink-600 leading-relaxed">
           Send us your product and packaging requirements and we will come back with a
           machine recommendation and a price. Installation and operator training are
           included with every machine.
         </p>
-
-        <dl class="mt-10 space-y-6 border-t border-ink-300/60 pt-8">
-          <div>
-            <dt class="eyebrow text-ink-600 mb-2">Prefer to call</dt>
-            <dd>
-              <a
-                href={`tel:${contactPhone.phoneHref}`}
-                class="font-heading text-xl font-bold hover:text-accent transition-colors"
-              >
-                {contactPhone.phone}
-              </a>
-              <span class="block text-sm text-ink-600">{contactPhone.region}</span>
-            </dd>
-          </div>
-          <div>
-            <dt class="eyebrow text-ink-600 mb-2">Email</dt>
-            <dd>
-              <a
-                href={`mailto:${company.email}`}
-                class="font-medium hover:text-accent transition-colors break-all"
-              >
-                {company.email}
-              </a>
-            </dd>
-          </div>
-        </dl>
       </div>
 
-      <div>
-        <form id="quote-form" class="bg-surface border border-ink-300/60 p-6 lg:p-10" novalidate>
-          {/* 1 — PRODUCTO */}
-          <fieldset>
-            <legend class="eyebrow text-accent">1 — Your product</legend>
+      <div class="flex flex-wrap gap-x-10 gap-y-4">
+        <div>
+          <p class="eyebrow text-ink-600 mb-1.5">Prefer to call</p>
+          <a
+            href={`tel:${contactPhone.phoneHref}`}
+            class="font-heading text-xl font-bold hover:text-accent transition-colors"
+          >
+            {contactPhone.phone}
+          </a>
+        </div>
+        <div>
+          <p class="eyebrow text-ink-600 mb-1.5">Email</p>
+          <a
+            href={`mailto:${company.email}`}
+            class="font-medium hover:text-accent transition-colors break-all"
+          >
+            {company.email}
+          </a>
+        </div>
+      </div>
+    </div>
 
-            <div class="mt-6 space-y-5">
-              <div class="field">
-                <label for="q-pack">What are you looking to pack?</label>
-                <textarea
-                  id="q-pack"
-                  name="pack"
-                  rows="3"
-                  required
-                  placeholder="e.g. protein bars, 40 g, 60 units per minute"></textarea>
-              </div>
+    <form id="quote-form" class="bg-surface border border-ink-300/60" novalidate>
+      <div class="grid lg:grid-cols-3">
+        {/* 1 — PRODUCTO */}
+        <fieldset class="p-6 lg:p-8 border-b border-ink-300/60 lg:border-b-0 lg:border-r">
+          <legend class="eyebrow text-accent">1 — Your product</legend>
 
-              <div class="grid gap-5 sm:grid-cols-2">
-                <div class="field">
-                  <span class="field-label">Item type</span>
-                  <div class="mt-2 flex gap-5">
-                    <label class="choice">
-                      <input type="radio" name="itemType" value="food" checked />
-                      Food
-                    </label>
-                    <label class="choice">
-                      <input type="radio" name="itemType" value="non-food" />
-                      Non-food
-                    </label>
-                  </div>
-                </div>
+          <div class="mt-6 space-y-5">
+            <div class="field">
+              <label for="q-pack">What are you looking to pack?</label>
+              <textarea
+                id="q-pack"
+                name="pack"
+                rows="3"
+                required
+                placeholder="e.g. protein bars, 40 g, 60 units per minute"></textarea>
+            </div>
 
-                <div class="field">
-                  <span class="field-label">Electric eye required</span>
-                  <div class="mt-2 flex gap-5">
-                    <label class="choice">
-                      <input type="radio" name="electricEye" value="yes" />
-                      Yes
-                    </label>
-                    <label class="choice">
-                      <input type="radio" name="electricEye" value="no" />
-                      No
-                    </label>
-                    <label class="choice">
-                      <input type="radio" name="electricEye" value="unsure" checked />
-                      Not sure
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <div class="field">
-                <label for="q-material">Packaging material</label>
-                <input
-                  id="q-material"
-                  name="material"
-                  type="text"
-                  placeholder="e.g. printed laminate film, 50 micron"
-                />
+            <div class="field">
+              <span class="field-label">Item type</span>
+              <div class="mt-2 flex flex-wrap gap-x-5 gap-y-2">
+                <label class="choice">
+                  <input type="radio" name="itemType" value="food" checked />
+                  Food
+                </label>
+                <label class="choice">
+                  <input type="radio" name="itemType" value="non-food" />
+                  Non-food
+                </label>
               </div>
             </div>
-          </fieldset>
 
-          {/* 2 — EMPRESA */}
-          <fieldset class="mt-10 border-t border-ink-300/60 pt-8">
-            <legend class="eyebrow text-accent">2 — Your company</legend>
-
-            <div class="mt-6 grid gap-5 sm:grid-cols-2">
-              <div class="field sm:col-span-2">
-                <label for="q-address">Address</label>
-                <input id="q-address" name="address" type="text" autocomplete="street-address" />
+            <div class="field">
+              <span class="field-label">Electric eye required</span>
+              <div class="mt-2 flex flex-wrap gap-x-5 gap-y-2">
+                <label class="choice">
+                  <input type="radio" name="electricEye" value="yes" />
+                  Yes
+                </label>
+                <label class="choice">
+                  <input type="radio" name="electricEye" value="no" />
+                  No
+                </label>
+                <label class="choice">
+                  <input type="radio" name="electricEye" value="unsure" checked />
+                  Not sure
+                </label>
               </div>
+            </div>
+
+            <div class="field">
+              <label for="q-material">Packaging material</label>
+              <input
+                id="q-material"
+                name="material"
+                type="text"
+                placeholder="e.g. printed laminate film"
+              />
+            </div>
+          </div>
+        </fieldset>
+
+        {/* 2 — EMPRESA */}
+        <fieldset class="p-6 lg:p-8 border-b border-ink-300/60 lg:border-b-0 lg:border-r">
+          <legend class="eyebrow text-accent">2 — Your company</legend>
+
+          <div class="mt-6 space-y-5">
+            <div class="field">
+              <label for="q-address">Address</label>
+              <input id="q-address" name="address" type="text" autocomplete="street-address" />
+            </div>
+            <div class="grid gap-5 sm:grid-cols-2">
               <div class="field">
                 <label for="q-city">City</label>
                 <input id="q-city" name="city" type="text" autocomplete="address-level2" />
@@ -134,74 +132,75 @@ const contactPhone = company.locations[0]!;
                 <label for="q-postal">Postal code</label>
                 <input id="q-postal" name="postalCode" type="text" autocomplete="postal-code" />
               </div>
-              <div class="field sm:col-span-2">
-                <label for="q-country">Country</label>
-                <input id="q-country" name="country" type="text" autocomplete="country-name" />
-              </div>
             </div>
-          </fieldset>
-
-          {/* 3 — CONTACTO */}
-          <fieldset class="mt-10 border-t border-ink-300/60 pt-8">
-            <legend class="eyebrow text-accent">3 — How we reach you</legend>
-
-            <div class="mt-6 grid gap-5 sm:grid-cols-2">
-              <div class="field">
-                <label for="q-name">Name</label>
-                <input id="q-name" name="name" type="text" required autocomplete="name" />
-              </div>
-              <div class="field">
-                <label for="q-email">Email</label>
-                <input id="q-email" name="email" type="email" required autocomplete="email" />
-              </div>
-              <div class="field sm:col-span-2">
-                <label for="q-phone">Phone</label>
-                <input id="q-phone" name="phone" type="tel" autocomplete="tel" />
-              </div>
-              <div class="field sm:col-span-2">
-                <label for="q-notes">Additional information</label>
-                <textarea id="q-notes" name="notes" rows="3"></textarea>
-              </div>
+            <div class="field">
+              <label for="q-country">Country</label>
+              <input id="q-country" name="country" type="text" autocomplete="country-name" />
             </div>
-          </fieldset>
+          </div>
+        </fieldset>
 
-          <button
-            type="submit"
-            class="mt-8 w-full rounded-sm bg-accent px-8 py-4 font-semibold text-white hover:bg-accent-hi transition-colors sm:w-auto"
-          >
-            Request a quote
-          </button>
+        {/* 3 — CONTACTO */}
+        <fieldset class="p-6 lg:p-8">
+          <legend class="eyebrow text-accent">3 — How we reach you</legend>
 
-          {/* Aviso de demo: este formulario no envía nada. */}
-          <p class="mt-4 text-xs text-ink-600">
-            This is a design concept — the form does not submit anywhere.
-          </p>
-        </form>
-
-        {/* Confirmación simulada. */}
-        <div
-          id="quote-success"
-          hidden
-          class="bg-surface border border-accent p-10 lg:p-14 text-center"
-          role="status"
-        >
-          <span class="mx-auto block w-12 h-[3px] bg-accent" aria-hidden="true"></span>
-          <h3 class="mt-8 text-2xl lg:text-3xl">Thank you — we have your request.</h3>
-          <p class="mt-4 text-ink-600 leading-relaxed max-w-md mx-auto">
-            A member of the team will get back to you within one business day with a
-            machine recommendation. In the meantime you are welcome to call us directly.
-          </p>
-          <a
-            href={`tel:${contactPhone.phoneHref}`}
-            class="mt-6 inline-block font-heading text-xl font-bold text-accent hover:text-accent-hi transition-colors"
-          >
-            {contactPhone.phone}
-          </a>
-          <p class="mt-8 text-xs text-ink-600">
-            Simulated response — nothing was sent.
-          </p>
-        </div>
+          <div class="mt-6 space-y-5">
+            <div class="field">
+              <label for="q-name">Name</label>
+              <input id="q-name" name="name" type="text" required autocomplete="name" />
+            </div>
+            <div class="field">
+              <label for="q-email">Email</label>
+              <input id="q-email" name="email" type="email" required autocomplete="email" />
+            </div>
+            <div class="field">
+              <label for="q-phone">Phone</label>
+              <input id="q-phone" name="phone" type="tel" autocomplete="tel" />
+            </div>
+            <div class="field">
+              <label for="q-notes">Additional information</label>
+              <textarea id="q-notes" name="notes" rows="3"></textarea>
+            </div>
+          </div>
+        </fieldset>
       </div>
+
+      {/* Pie del formulario: acción y aviso de demo, a lo ancho de las tres columnas. */}
+      <div
+        class="flex flex-wrap items-center justify-between gap-4 border-t border-ink-300/60 bg-surface-2 px-6 py-5 lg:px-8"
+      >
+        <p class="text-xs text-ink-600">
+          This is a design concept — the form does not submit anywhere.
+        </p>
+        <button
+          type="submit"
+          class="w-full rounded-sm bg-accent px-8 py-3.5 font-semibold text-white hover:bg-accent-hi transition-colors sm:w-auto"
+        >
+          Request a quote
+        </button>
+      </div>
+    </form>
+
+    {/* Confirmación simulada. */}
+    <div
+      id="quote-success"
+      hidden
+      class="bg-surface border border-accent p-10 lg:p-16 text-center"
+      role="status"
+    >
+      <span class="mx-auto block w-12 h-[3px] bg-accent" aria-hidden="true"></span>
+      <h3 class="mt-8 text-2xl lg:text-3xl">Thank you — we have your request.</h3>
+      <p class="mt-4 text-ink-600 leading-relaxed max-w-md mx-auto">
+        A member of the team will get back to you within one business day with a machine
+        recommendation. In the meantime you are welcome to call us directly.
+      </p>
+      <a
+        href={`tel:${contactPhone.phoneHref}`}
+        class="mt-6 inline-block font-heading text-xl font-bold text-accent hover:text-accent-hi transition-colors"
+      >
+        {contactPhone.phone}
+      </a>
+      <p class="mt-8 text-xs text-ink-600">Simulated response — nothing was sent.</p>
     </div>
   </div>
 </section>
