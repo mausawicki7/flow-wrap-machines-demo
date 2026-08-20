@@ -295,4 +295,23 @@
     width: 1rem;
     height: 1rem;
   }
+
+  /*
+    <legend> no es un bloque común: el navegador lo renderiza dentro de la caja del
+    borde del fieldset e ignora su padding-top, así que el título quedaba pegado al
+    borde superior de la tarjeta —como cortado— y con un hueco de más abajo.
+
+    Con float pierde ese tratamiento especial y fluye como un bloque normal, ya
+    respetando el padding. El clear del hermano siguiente evita que el contenido se
+    superponga con el float.
+  */
+  #quote-form legend {
+    float: left;
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  #quote-form legend + * {
+    clear: both;
+  }
 }
